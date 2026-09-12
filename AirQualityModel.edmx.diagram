@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="6a729ae974fa421e9ac27c2ac4409029" Name="Diagram1" ZoomLevel="80">
+        <EntityTypeShape EntityType="AirQualityDBModel.AirQualityRecord" Width="1.5" PointX="7.625" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.Alert" Width="1.5" PointX="10.125" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.AlertNote" Width="1.5" PointX="13" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.AQICategory" Width="1.5" PointX="7.625" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.City" Width="1.5" PointX="7.625" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.Country" Width="1.5" PointX="7.625" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.GasPollutant" Width="1.5" PointX="2.125" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.ParticulatePollutant" Width="1.5" PointX="4.875" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AirQualityDBModel.Pollutant" Width="1.5" PointX="4.875" PointY="4" IsExpanded="true" />
+        <AssociationConnector Association="AirQualityDBModel.FK_AirQualityRecord_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_AirQualityRecord_City" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_AirQualityRecord_Pollutant" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_Alert_AirQualityRecord" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_AlertNote_Alert" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_City_Country" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_GasPollutant_Pollutant" ManuallyRouted="false" />
+        <AssociationConnector Association="AirQualityDBModel.FK_ParticulatePollutant_Pollutant" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="AirQualityDBModel.RawAirQualityImport" Width="1.5" PointX="2.125" PointY="8.25" />
+        <EntityTypeShape EntityType="AirQualityDBModel.vw_AirQualityRecordDetails" Width="1.5" PointX="12.75" PointY="8" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

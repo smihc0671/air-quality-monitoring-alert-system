@@ -1,0 +1,41 @@
+﻿@model AirQualityAnalysis.City
+
+@{
+    ViewBag.Title = "Edit City";
+}
+
+<h3>Edit City</h3>
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div style="max-width:500px">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.CityID)
+            @Html.HiddenFor(model => model.CountryID)
+
+            <div style="margin-bottom:15px;">
+                <label>Country</label><br />
+                <input value="@ViewBag.CountryName" disabled style="width:100%; padding:6px;" />
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <label>City Name</label><br />
+                @Html.TextBoxFor(model => model.CityName, new { style = "width:100%; padding:6px;" })
+            </div>
+
+            <input type="submit" value="Save" class="btn btn-success me-2" />
+
+            <a href="@Url.Action("Index", "Cities")" class="btn btn-secondary">
+                Cancel
+            </a>
+        }
+
+    </div>
+}

@@ -1,0 +1,47 @@
+﻿@model AirQualityAnalysis.Country
+
+@{
+    ViewBag.Title = "Delete Country";
+}
+
+<h3>Delete Country</h3>
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div style="max-width:500px;">
+        <p>Are you sure you want to delete this country?</p>
+
+        <div style="margin-bottom:15px;">
+            <strong>Country ID:</strong> @Model.CountryID
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <strong>Country Name:</strong> @Model.CountryName
+        </div>
+
+        <div style="margin-top:20px;">
+            @using (Html.BeginForm("Delete", "Countries", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.CountryID)
+
+                <input type="submit"
+                       value="Delete"
+                       style="padding:8px 14px; background:#dc2626; color:white; border:none; border-radius:6px; margin-right:10px;" />
+
+                <a href="@Url.Action("Index", "Countries")" style="padding:8px 14px;">
+                    Cancel
+                </a>
+            }
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <p style="color:red; margin-top:15px;">@ViewBag.ErrorMessage</p>
+            }
+        </div>
+    </div>
+}

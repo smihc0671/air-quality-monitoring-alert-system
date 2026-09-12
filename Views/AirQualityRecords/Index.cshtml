@@ -1,0 +1,335 @@
+﻿@model AirQualityAnalysis.Controllers.AirQualityRecordsController.AirQualityRecordsIndexViewModel
+
+@{
+    ViewBag.Title = "Air Quality Records";
+    var userRole = Session["UserRole"] as string;
+    bool isAdmin = userRole == "Admin";
+}
+
+<h3>Air Quality Records</h3>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div style="margin-bottom:15px; color:red;">@TempData["ErrorMessage"]</div>
+}
+
+@using (Html.BeginForm("Index", "AirQualityRecords", FormMethod.Get))
+{
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; align-items:end;">
+
+        <div>
+            <label>Country</label><br />
+            <select name="countryId" id="countryId" style="padding:6px; width:220px;">
+                <option value="0" @(Model.SelectedCountryId == 0 ? "selected" : "")>All Countries</option>
+                @foreach (var country in Model.Countries)
+                {
+                    <option value="@country.CountryID" @(Model.SelectedCountryId == country.CountryID ? "selected" : "")>
+                        @country.CountryName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>City</label><br />
+            <select name="cityId" id="cityId" style="padding:6px; width:220px;" @(Model.SelectedCountryId == 0 ? "disabled" : "")>
+                <option value="0" @(Model.SelectedCityId == 0 ? "selected" : "")>All Cities</option>
+                @foreach (var city in Model.Cities)
+                {
+                    <option value="@city.CityID" @(Model.SelectedCityId == city.CityID ? "selected" : "")>
+                        @city.CityName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Pollutant</label><br />
+            <select name="pollutantId" style="padding:6px; width:220px;">
+                <option value="0" @(Model.SelectedPollutantId == 0 ? "selected" : "")>All Pollutants</option>
+                @foreach (var pollutant in Model.Pollutants)
+                {
+                    <option value="@pollutant.PollutantID" @(Model.SelectedPollutantId == pollutant.PollutantID ? "selected" : "")>
+                        @pollutant.PollutantName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Page Size</label><br />
+            <select name="pageSize" style="padding:6px; width:100px;">
+                <option value="10" @(Model.SelectedPageSize == 10 ? "selected" : "")>10</option>
+                <option value="25" @(Model.SelectedPageSize == 25 ? "selected" : "")>25</option>
+                <option value="50" @(Model.SelectedPageSize == 50 ? "selected" : "")>50</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Sort By</label><br />
+            <select name="sortOption" style="padding:6px; width:220px;">
+                @if (Model.SelectedPollutantId == 0)
+                {
+                    <option value="aqiDesc" @(Model.SelectedSortOption == "aqiDesc" ? "selected" : "")>Overall AQI (High to Low)</option>
+                    <option value="aqiAsc" @(Model.SelectedSortOption == "aqiAsc" ? "selected" : "")>Overall AQI (Low to High)</option>
+                    <option value="dateDesc" @(Model.SelectedSortOption == "dateDesc" ? "selected" : "")>Last Updated (Newest)</option>
+                    <option value="dateAsc" @(Model.SelectedSortOption == "dateAsc" ? "selected" : "")>Last Updated (Oldest)</option>
+                    <option value="countryAsc" @(Model.SelectedSortOption == "countryAsc" ? "selected" : "")>Country (A-Z)</option>
+                    <option value="countryDesc" @(Model.SelectedSortOption == "countryDesc" ? "selected" : "")>Country (Z-A)</option>
+                    <option value="cityAsc" @(Model.SelectedSortOption == "cityAsc" ? "selected" : "")>City (A-Z)</option>
+                    <option value="cityDesc" @(Model.SelectedSortOption == "cityDesc" ? "selected" : "")>City (Z-A)</option>
+                }
+                else
+                {
+                    <option value="aqiDesc" @(Model.SelectedSortOption == "aqiDesc" ? "selected" : "")>AQI Value (High to Low)</option>
+                    <option value="aqiAsc" @(Model.SelectedSortOption == "aqiAsc" ? "selected" : "")>AQI Value (Low to High)</option>
+                    <option value="dateDesc" @(Model.SelectedSortOption == "dateDesc" ? "selected" : "")>Last Updated (Newest)</option>
+                    <option value="dateAsc" @(Model.SelectedSortOption == "dateAsc" ? "selected" : "")>Last Updated (Oldest)</option>
+                    <option value="countryAsc" @(Model.SelectedSortOption == "countryAsc" ? "selected" : "")>Country (A-Z)</option>
+                    <option value="countryDesc" @(Model.SelectedSortOption == "countryDesc" ? "selected" : "")>Country (Z-A)</option>
+                    <option value="cityAsc" @(Model.SelectedSortOption == "cityAsc" ? "selected" : "")>City (A-Z)</option>
+                    <option value="cityDesc" @(Model.SelectedSortOption == "cityDesc" ? "selected" : "")>City (Z-A)</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="action-btn action-btn-primary">Apply</button>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Index", "AirQualityRecords")" class="action-btn">Clear</a>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div>
+                <a href="@Url.Action("Create", "AirQualityRecords")" class="action-btn action-btn-success">
+                    Create New Record Set
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@if (!Model.HasSearched)
+{
+    <p>Please select filters and click Apply.</p>
+}
+else
+{
+    <div class="pagination-bar">
+        @if (Model.CurrentPage > 1)
+        {
+            <a class="pagination-btn" href="@Url.Action("Index", new {
+                countryId = Model.SelectedCountryId,
+                cityId = Model.SelectedCityId,
+                pollutantId = Model.SelectedPollutantId,
+                sortOption = Model.SelectedSortOption,
+                page = Model.CurrentPage - 1,
+                pageSize = Model.SelectedPageSize
+            })">Previous</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled">Previous</span>
+        }
+
+        <span class="pagination-info">Page @Model.CurrentPage of @Model.TotalPages</span>
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a class="pagination-btn" href="@Url.Action("Index", new {
+                countryId = Model.SelectedCountryId,
+                cityId = Model.SelectedCityId,
+                pollutantId = Model.SelectedPollutantId,
+                sortOption = Model.SelectedSortOption,
+                page = Model.CurrentPage + 1,
+                pageSize = Model.SelectedPageSize
+            })">Next</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled">Next</span>
+        }
+    </div>
+
+    <div style="margin-bottom:15px;">
+        Total Records: @Model.TotalRecords
+    </div>
+
+    if (Model.SelectedPollutantId == 0)
+    {
+        if (Model.GroupedRecords == null || !Model.GroupedRecords.Any())
+        {
+            <p>No records found.</p>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th>City</th>
+                        <th>Overall AQI Value</th>
+                        <th>Overall AQI Category</th>
+                        <th>CO AQI Value</th>
+                        <th>CO AQI Category</th>
+                        <th>Ozone AQI Value</th>
+                        <th>Ozone AQI Category</th>
+                        <th>NO2 AQI Value</th>
+                        <th>NO2 AQI Category</th>
+                        <th>PM2.5 AQI Value</th>
+                        <th>PM2.5 AQI Category</th>
+                        <th>Last Updated</th>
+                        @if (isAdmin)
+                        {
+                            <th>Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.GroupedRecords)
+                    {
+                        <tr>
+                            <td>@item.Country</td>
+                            <td>@item.City</td>
+                            <td>@(item.AQIValue?.ToString() ?? "—")</td>
+                            <td>@(item.AQICategory ?? "—")</td>
+                            <td>@(item.COAQIValue?.ToString() ?? "—")</td>
+                            <td>@(item.COAQICategory ?? "—")</td>
+                            <td>@(item.OzoneAQIValue?.ToString() ?? "—")</td>
+                            <td>@(item.OzoneAQICategory ?? "—")</td>
+                            <td>@(item.NO2AQIValue?.ToString() ?? "—")</td>
+                            <td>@(item.NO2AQICategory ?? "—")</td>
+                            <td>@(item.PM25AQIValue?.ToString() ?? "—")</td>
+                            <td>@(item.PM25AQICategory ?? "—")</td>
+                            <td style="white-space:nowrap;">@(item.LastUpdated.HasValue ? item.LastUpdated.Value.ToString("dd.MM.yyyy HH:mm") : "—")</td>
+
+                            @if (isAdmin)
+                            {
+                                <td>
+                                    <a href="@Url.Action("CityRecords", "AirQualityRecords", new {
+                                        cityId = item.CityID,
+                                        countryId = Model.SelectedCountryId,
+                                        selectedCityId = Model.SelectedCityId,
+                                        pollutantId = Model.SelectedPollutantId,
+                                        page = Model.CurrentPage
+                                    })"
+                                       class="btn btn-sm btn-primary">
+                                        Details
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+    else
+    {
+        if (Model.Records == null || !Model.Records.Any())
+        {
+            <p>No records found.</p>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Record ID</th>
+                        <th>Country</th>
+                        <th>City</th>
+                        <th>Pollutant</th>
+                        <th>Category</th>
+                        <th>AQI Value</th>
+                        <th>Last Updated</th>
+                        @if (isAdmin)
+                        {
+                            <th>Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Records)
+                    {
+                        <tr>
+                            <td>@item.RecordID</td>
+                            <td>@item.CountryName</td>
+                            <td>@item.CityName</td>
+                            <td>@item.PollutantName</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.AQIValue</td>
+                            <td style="white-space:nowrap;">@item.LastUpdated.ToString("dd.MM.yyyy HH:mm:ss")</td>
+
+                            @if (isAdmin)
+                            {
+                                <td>
+                                    <a href="@Url.Action("Edit", "AirQualityRecords", new {
+                                        id = item.RecordID,
+                                        countryId = Model.SelectedCountryId,
+                                        cityId = Model.SelectedCityId,
+                                        pollutantId = Model.SelectedPollutantId,
+                                        page = Model.CurrentPage
+                                    })" class="btn btn-sm btn-primary">Edit</a>
+
+                                    <a href="@Url.Action("Delete", "AirQualityRecords", new {
+                                        id = item.RecordID,
+                                        countryId = Model.SelectedCountryId,
+                                        cityId = Model.SelectedCityId,
+                                        pollutantId = Model.SelectedPollutantId,
+                                        page = Model.CurrentPage
+                                    })" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var countryDropdown = document.getElementById("countryId");
+        var cityDropdown = document.getElementById("cityId");
+
+        if (!countryDropdown || !cityDropdown) return;
+
+        countryDropdown.addEventListener("change", function () {
+            var countryId = this.value;
+
+            cityDropdown.innerHTML = '<option value="0">All Cities</option>';
+            cityDropdown.value = "0";
+
+            if (!countryId || countryId === "0") {
+                cityDropdown.disabled = true;
+                return;
+            }
+
+            fetch('/Cities/GetCitiesByCountry?countryId=' + countryId)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to load cities.");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    cityDropdown.disabled = false;
+
+                    data.forEach(function (city) {
+                        var option = document.createElement("option");
+                        option.value = city.CityID;
+                        option.text = city.CityName;
+                        cityDropdown.appendChild(option);
+                    });
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    cityDropdown.disabled = true;
+                });
+        });
+    });
+</script>

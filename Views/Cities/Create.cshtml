@@ -1,0 +1,39 @@
+﻿@model AirQualityAnalysis.City
+
+@{
+    ViewBag.Title = "Create City";
+}
+
+<h3>Create City</h3>
+
+<div style="max-width:500px">
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div style="margin-bottom:15px;">
+            <label>Country</label><br />
+            @Html.DropDownListFor(
+                model => model.CountryID,
+                (SelectList)ViewBag.CountryID,
+                "Select Country",
+                new { style = "width:100%; padding:6px;" }
+            )
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label>City Name</label><br />
+            @Html.TextBoxFor(model => model.CityName, new { style = "width:100%; padding:6px;" })
+        </div>
+
+        <input type="submit" value="Save" class="btn btn-success me-2" />
+
+        <a href="@Url.Action("Index", "Cities")" class="btn btn-secondary">
+            Cancel
+        </a>
+    }
+
+</div>

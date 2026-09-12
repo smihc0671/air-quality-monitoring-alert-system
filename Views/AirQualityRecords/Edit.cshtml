@@ -1,0 +1,115 @@
+﻿@model AirQualityAnalysis.Controllers.AirQualityRecordsController.EditAirQualityRecordViewModel
+
+@{
+    ViewBag.Title = "Edit Air Quality Record";
+}
+
+<h3>Edit Air Quality Record</h3>
+
+@Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+@if (Model.IsOverallAQI)
+{
+    <div class="alert alert-warning">
+        Overall AQI is auto calculated and cannot be edited manually.
+    </div>
+
+    <div class="mb-3">
+        <label><strong>Country</strong></label>
+        <input class="form-control" value="@Model.CountryName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label><strong>City</strong></label>
+        <input class="form-control" value="@Model.CityName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label><strong>Pollutant</strong></label>
+        <input class="form-control" value="@Model.PollutantName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label><strong>AQI Value</strong></label>
+        <input class="form-control" value="@Model.AQIValue" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label><strong>Category</strong></label>
+        <input class="form-control" value="@Model.CurrentCategoryName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label><strong>Last Updated</strong></label>
+        <input class="form-control" value="@Model.LastUpdated" readonly />
+    </div>
+
+    <a class="btn btn-secondary"
+       href="@Url.Action("CityRecords", "AirQualityRecords", new {
+       cityId = Model.CityID,
+       countryId = Model.ReturnCountryId,
+       selectedCityId = Model.CityID,
+       pollutantId = Model.ReturnPollutantId,
+       page = Model.ReturnPage
+   })">
+        Back
+    </a>
+}
+else
+{
+    using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(x => x.RecordID)
+        @Html.HiddenFor(x => x.CountryID)
+        @Html.HiddenFor(x => x.CityID)
+        @Html.HiddenFor(x => x.PollutantID)
+        @Html.HiddenFor(x => x.ReturnCountryId)
+        @Html.HiddenFor(x => x.ReturnCityId)
+        @Html.HiddenFor(x => x.ReturnPollutantId)
+        @Html.HiddenFor(x => x.ReturnPage)
+
+        <div class="mb-3">
+            <label><strong>Country</strong></label>
+            <input class="form-control" value="@Model.CountryName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label><strong>City</strong></label>
+            <input class="form-control" value="@Model.CityName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label><strong>Pollutant</strong></label>
+            <input class="form-control" value="@Model.PollutantName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label><strong>Current Category</strong></label>
+            <input class="form-control" value="@Model.CurrentCategoryName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label><strong>AQI Value</strong></label>
+            @Html.TextBoxFor(x => x.AQIValue, new { @class = "form-control", type = "number" })
+        </div>
+
+        <div class="mb-3">
+            <label><strong>Calculated Category</strong></label>
+            <input class="form-control" value="@Model.CalculatedCategoryName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label><strong>Last Updated</strong></label>
+            <input class="form-control" value="@Model.LastUpdated" readonly />
+        </div>
+
+        <button class="btn btn-primary me-2" type="submit">Save</button>
+
+        <a class="btn btn-secondary"
+           href="@Url.Action("Index", "AirQualityRecords", new { countryId = Model.ReturnCountryId, cityId = Model.ReturnCityId, pollutantId = Model.ReturnPollutantId, page = Model.ReturnPage })">
+            Back
+        </a>
+    }
+}

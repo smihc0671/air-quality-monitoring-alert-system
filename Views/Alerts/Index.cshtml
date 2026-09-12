@@ -1,0 +1,241 @@
+﻿@model AirQualityAnalysis.Controllers.AlertsController.AlertsIndexViewModel
+
+@{
+    ViewBag.Title = "Alerts";
+}
+
+<h2>Alerts</h2>
+
+@using (Html.BeginForm("Index", "Alerts", FormMethod.Get))
+{
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; align-items:end;">
+
+        <div>
+            <label>Country</label><br />
+            <select name="countryId" id="countryId" style="padding:6px; width:220px;">
+                <option value="0">All Countries</option>
+                @foreach (var country in Model.Countries)
+                {
+                    <option value="@country.CountryID" @(Model.SelectedCountryId == country.CountryID ? "selected" : "")>
+                        @country.CountryName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>City</label><br />
+            <select name="cityId" id="cityId" style="padding:6px; width:220px;" @(Model.SelectedCountryId == 0 ? "disabled" : "")>
+                <option value="0">All Cities</option>
+                @foreach (var city in Model.Cities)
+                {
+                    <option value="@city.CityID" @(Model.SelectedCityId == city.CityID ? "selected" : "")>
+                        @city.CityName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Alert Level</label><br />
+            <select name="alertLevel" style="padding:6px; width:220px;">
+                <option value="">All Levels</option>
+                @foreach (var level in Model.AlertLevels)
+                {
+                    <option value="@level" @(Model.SelectedAlertLevel == level ? "selected" : "")>
+                        @level
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Page Size</label><br />
+            <select name="pageSize" style="padding:6px; width:120px;">
+                <option value="10" @(Model.SelectedPageSize == 10 ? "selected" : "")>10</option>
+                <option value="25" @(Model.SelectedPageSize == 25 ? "selected" : "")>25</option>
+                <option value="50" @(Model.SelectedPageSize == 50 ? "selected" : "")>50</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="action-btn action-btn-primary">Apply</button>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Index", "Alerts")" class="action-btn">Clear</a>
+        </div>
+    </div>
+}
+
+@if (!Model.HasSearched)
+{
+    <p>Please select filters and click Apply.</p>
+}
+else
+{
+    <div class="pagination-bar">
+        @if (Model.CurrentPage > 1)
+        {
+            <a class="pagination-btn" href="@Url.Action("Index", new {
+                countryId = Model.SelectedCountryId,
+                cityId = Model.SelectedCityId,
+                alertLevel = Model.SelectedAlertLevel,
+                page = Model.CurrentPage - 1,
+                pageSize = Model.SelectedPageSize
+            })">Previous</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled">Previous</span>
+        }
+
+        <span class="pagination-info">Page @Model.CurrentPage of @(Model.TotalPages == 0 ? 1 : Model.TotalPages)</span>
+
+        @if (Model.TotalPages > 0 && Model.CurrentPage < Model.TotalPages)
+        {
+            <a class="pagination-btn" href="@Url.Action("Index", new {
+                countryId = Model.SelectedCountryId,
+                cityId = Model.SelectedCityId,
+                alertLevel = Model.SelectedAlertLevel,
+                page = Model.CurrentPage + 1,
+                pageSize = Model.SelectedPageSize
+            })">Next</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled">Next</span>
+        }
+    </div>
+
+    <div style="margin-bottom:15px;">
+        Total Alerts: @Model.TotalRecords
+    </div>
+
+    if (Model.Alerts == null || Model.Alerts.Count == 0)
+    {
+        <p>No alerts found.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Alert ID</th>
+                    <th>Country</th>
+                    <th>City</th>
+                    <th>Pollutant</th>
+                    <th>AQI Value</th>
+                    <th>AQI Category</th>
+                    <th>Alert Level</th>
+                    <th>Alert Message</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Alerts)
+                {
+                    var causeText = !string.IsNullOrWhiteSpace(item.CausePollutantsText)
+                        ? item.CausePollutantsText
+                        : "";
+
+                    string finalMessage = "";
+
+                    switch (item.AlertLevel)
+                    {
+                        case "Warning":
+                            finalMessage = "Air quality warning in " + item.CityName +
+                                           (string.IsNullOrWhiteSpace(causeText) ? "." : ". Causes: " + causeText);
+                            break;
+
+                        case "High":
+                            finalMessage = "Air quality is unhealthy in " + item.CityName +
+                                           (string.IsNullOrWhiteSpace(causeText) ? "." : ". Causes: " + causeText);
+                            break;
+
+                        case "Critical":
+                            finalMessage = "Air quality is very unhealthy in " + item.CityName +
+                                           (string.IsNullOrWhiteSpace(causeText) ? "." : ". Causes: " + causeText);
+                            break;
+
+                        case "Emergency":
+                            finalMessage = "Air quality is hazardous in " + item.CityName +
+                                           (string.IsNullOrWhiteSpace(causeText) ? "." : ". Causes: " + causeText);
+                            break;
+
+                        default:
+                            finalMessage = !string.IsNullOrWhiteSpace(item.AlertMessage)
+                                ? item.AlertMessage
+                                : "Air quality alert detected in " + item.CityName +
+                                  (string.IsNullOrWhiteSpace(causeText) ? "." : ". Causes: " + causeText);
+                            break;
+                    }
+
+                    string badgeStyle = "display:inline-block; padding:4px 10px; border-radius:999px; font-weight:600;";
+
+                    if (item.AlertLevel == "Warning")
+                    {
+                        badgeStyle += " background:#facc15; color:#111827;";
+                    }
+                    else if (item.AlertLevel == "High")
+                    {
+                        badgeStyle += " background:#fb923c; color:white;";
+                    }
+                    else if (item.AlertLevel == "Critical")
+                    {
+                        badgeStyle += " background:#ef4444; color:white;";
+                    }
+                    else if (item.AlertLevel == "Emergency")
+                    {
+                        badgeStyle += " background:#7f1d1d; color:white;";
+                    }
+                    else
+                    {
+                        badgeStyle += " background:#e5e7eb; color:#111827;";
+                    }
+
+                    <tr>
+                        <td>@item.AlertID</td>
+                        <td>@item.CountryName</td>
+                        <td>@item.CityName</td>
+                        <td>@item.PollutantName</td>
+                        <td>@item.AQIValue</td>
+                        <td>@item.AQICategoryName</td>
+                        <td>
+                            <span style="@badgeStyle">@item.AlertLevel</span>
+                        </td>
+                        <td>@finalMessage</td>
+                        <td>@item.LastUpdated.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#countryId").change(function () {
+                var countryId = $(this).val();
+                var cityDropdown = $("#cityId");
+
+                cityDropdown.empty();
+                cityDropdown.append($("<option>").val("0").text("All Cities"));
+
+                if (countryId && countryId !== "0") {
+                    cityDropdown.prop("disabled", false);
+
+                    $.getJSON('@Url.Action("GetCitiesByCountry", "Cities")', { countryId: countryId }, function (data) {
+                        $.each(data, function (i, city) {
+                            cityDropdown.append($("<option>").val(city.CityID).text(city.CityName));
+                        });
+                    });
+                } else {
+                    cityDropdown.prop("disabled", true);
+                }
+            });
+        });
+    </script>
+}

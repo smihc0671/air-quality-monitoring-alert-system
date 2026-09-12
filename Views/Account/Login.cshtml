@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .login-page {
+        height: calc(100vh - 51px);
+        width: 100%;
+        background-image:
+            linear-gradient(rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.48)),
+            url('@Url.Content("~/Content/Images/air-quality-bg.png")');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 430px;
+        background: rgba(255, 255, 255, 0.94);
+        padding: 28px;
+        border-radius: 14px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+    }
+
+    .login-card h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .login-description {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 22px;
+        line-height: 1.5;
+    }
+
+    .login-card label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+
+    .login-card .form-control {
+        border-radius: 7px;
+        padding: 8px 10px;
+    }
+
+    .login-card .btn-primary {
+        width: 100%;
+        padding: 9px;
+        border-radius: 7px;
+        font-weight: 600;
+    }
+
+    .login-note {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="login-page">
+    <div class="login-card">
+        <h2>Login</h2>
+
+        <p class="login-description">
+            Welcome to the Air Quality Monitoring and Alert System.
+            Please select your login type to continue.
+        </p>
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+        }
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div style="margin-bottom:15px;">
+                <label>Login Type</label><br />
+                <select name="role" id="roleSelect" class="form-control">
+                    <option value="">Select</option>
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <div id="adminFields" style="display:none;">
+                <div style="margin-bottom:15px;">
+                    <label>Username</label><br />
+                    <input type="text" name="username" class="form-control" />
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label>Password</label><br />
+                    <input type="password" name="password" class="form-control" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        }
+
+        <div class="login-note">
+            The system monitors air quality data and generates alert levels based on AQI values.
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.getElementById("roleSelect").addEventListener("change", function () {
+            var adminFields = document.getElementById("adminFields");
+            adminFields.style.display = this.value === "Admin" ? "block" : "none";
+        });
+    </script>
+}

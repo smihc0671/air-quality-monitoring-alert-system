@@ -1,0 +1,768 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AirQualityDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AirQualityRecord">
+          <Key>
+            <PropertyRef Name="RecordID" />
+          </Key>
+          <Property Name="RecordID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CityID" Type="int" Nullable="false" />
+          <Property Name="PollutantID" Type="int" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="AQIValue" Type="int" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Alert">
+          <Key>
+            <PropertyRef Name="AlertID" />
+          </Key>
+          <Property Name="AlertID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RecordID" Type="int" Nullable="false" />
+          <Property Name="AlertLevel" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AlertMessage" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AlertNote">
+          <Key>
+            <PropertyRef Name="AlertID" />
+            <PropertyRef Name="NoteNo" />
+          </Key>
+          <Property Name="AlertID" Type="int" Nullable="false" />
+          <Property Name="NoteNo" Type="int" Nullable="false" />
+          <Property Name="NoteText" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AQICategory">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CategoryName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MinValue" Type="int" />
+          <Property Name="MaxValue" Type="int" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="City">
+          <Key>
+            <PropertyRef Name="CityID" />
+          </Key>
+          <Property Name="CityID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CityName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="CountryID" Type="int" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="CountryID" />
+          </Key>
+          <Property Name="CountryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CountryName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="GasPollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="int" Nullable="false" />
+          <Property Name="GasType" Type="nvarchar" MaxLength="50" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ParticulatePollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="int" Nullable="false" />
+          <Property Name="ParticleType" Type="nvarchar" MaxLength="50" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Pollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PollutantName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RawAirQualityImport">
+          <Key>
+            <PropertyRef Name="ImportRowID" />
+          </Key>
+          <Property Name="ImportRowID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CountryName" Type="nvarchar" MaxLength="100" />
+          <Property Name="CityName" Type="nvarchar" MaxLength="150" />
+          <Property Name="AQIValue" Type="int" />
+          <Property Name="AQICategory" Type="nvarchar" MaxLength="100" />
+          <Property Name="CO_AQIValue" Type="int" />
+          <Property Name="CO_AQICategory" Type="nvarchar" MaxLength="100" />
+          <Property Name="Ozone_AQIValue" Type="int" />
+          <Property Name="Ozone_AQICategory" Type="nvarchar" MaxLength="100" />
+          <Property Name="NO2_AQIValue" Type="int" />
+          <Property Name="NO2_AQICategory" Type="nvarchar" MaxLength="100" />
+          <Property Name="PM25_AQIValue" Type="int" />
+          <Property Name="PM25_AQICategory" Type="nvarchar" MaxLength="100" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'AirQualityDB.dbo.vw_AirQualityRecordDetails' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_AirQualityRecordDetails">
+          <Key>
+            <PropertyRef Name="RecordID" />
+            <PropertyRef Name="CountryID" />
+            <PropertyRef Name="CountryName" />
+            <PropertyRef Name="CityID" />
+            <PropertyRef Name="CityName" />
+            <PropertyRef Name="PollutantID" />
+            <PropertyRef Name="PollutantName" />
+            <PropertyRef Name="AQIValue" />
+            <PropertyRef Name="CategoryID" />
+            <PropertyRef Name="CategoryName" />
+            <PropertyRef Name="RecordLastUpdated" />
+          </Key>
+          <Property Name="RecordID" Type="int" Nullable="false" />
+          <Property Name="CountryID" Type="int" Nullable="false" />
+          <Property Name="CountryName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="CityID" Type="int" Nullable="false" />
+          <Property Name="CityName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="PollutantID" Type="int" Nullable="false" />
+          <Property Name="PollutantName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AQIValue" Type="int" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="CategoryName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MinValue" Type="int" />
+          <Property Name="MaxValue" Type="int" />
+          <Property Name="RecordLastUpdated" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_AirQualityRecord_Category">
+          <End Role="AQICategory" Type="Self.AQICategory" Multiplicity="1" />
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AQICategory">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AirQualityRecord_City">
+          <End Role="City" Type="Self.City" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="City">
+              <PropertyRef Name="CityID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="CityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AirQualityRecord_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1" />
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Alert_AirQualityRecord">
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Alert" Type="Self.Alert" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AirQualityRecord">
+              <PropertyRef Name="RecordID" />
+            </Principal>
+            <Dependent Role="Alert">
+              <PropertyRef Name="RecordID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlertNote_Alert">
+          <End Role="Alert" Type="Self.Alert" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AlertNote" Type="Self.AlertNote" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Alert">
+              <PropertyRef Name="AlertID" />
+            </Principal>
+            <Dependent Role="AlertNote">
+              <PropertyRef Name="AlertID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_City_Country">
+          <End Role="Country" Type="Self.Country" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="City" Type="Self.City" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Country">
+              <PropertyRef Name="CountryID" />
+            </Principal>
+            <Dependent Role="City">
+              <PropertyRef Name="CountryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GasPollutant_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="GasPollutant" Type="Self.GasPollutant" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="GasPollutant">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParticulatePollutant_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ParticulatePollutant" Type="Self.ParticulatePollutant" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="ParticulatePollutant">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AirQualityDBModelStoreContainer">
+          <EntitySet Name="AirQualityRecord" EntityType="Self.AirQualityRecord" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Alert" EntityType="Self.Alert" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AlertNote" EntityType="Self.AlertNote" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AQICategory" EntityType="Self.AQICategory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="City" EntityType="Self.City" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Country" EntityType="Self.Country" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GasPollutant" EntityType="Self.GasPollutant" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ParticulatePollutant" EntityType="Self.ParticulatePollutant" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pollutant" EntityType="Self.Pollutant" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RawAirQualityImport" EntityType="Self.RawAirQualityImport" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_AirQualityRecordDetails" EntityType="Self.vw_AirQualityRecordDetails" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_AirQualityRecordDetails].[RecordID] AS [RecordID], 
+    [vw_AirQualityRecordDetails].[CountryID] AS [CountryID], 
+    [vw_AirQualityRecordDetails].[CountryName] AS [CountryName], 
+    [vw_AirQualityRecordDetails].[CityID] AS [CityID], 
+    [vw_AirQualityRecordDetails].[CityName] AS [CityName], 
+    [vw_AirQualityRecordDetails].[PollutantID] AS [PollutantID], 
+    [vw_AirQualityRecordDetails].[PollutantName] AS [PollutantName], 
+    [vw_AirQualityRecordDetails].[AQIValue] AS [AQIValue], 
+    [vw_AirQualityRecordDetails].[CategoryID] AS [CategoryID], 
+    [vw_AirQualityRecordDetails].[CategoryName] AS [CategoryName], 
+    [vw_AirQualityRecordDetails].[MinValue] AS [MinValue], 
+    [vw_AirQualityRecordDetails].[MaxValue] AS [MaxValue], 
+    [vw_AirQualityRecordDetails].[RecordLastUpdated] AS [RecordLastUpdated]
+    FROM [dbo].[vw_AirQualityRecordDetails] AS [vw_AirQualityRecordDetails]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_AirQualityRecord_Category" Association="Self.FK_AirQualityRecord_Category">
+            <End Role="AQICategory" EntitySet="AQICategory" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AirQualityRecord_City" Association="Self.FK_AirQualityRecord_City">
+            <End Role="City" EntitySet="City" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AirQualityRecord_Pollutant" Association="Self.FK_AirQualityRecord_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutant" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Alert_AirQualityRecord" Association="Self.FK_Alert_AirQualityRecord">
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecord" />
+            <End Role="Alert" EntitySet="Alert" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlertNote_Alert" Association="Self.FK_AlertNote_Alert">
+            <End Role="Alert" EntitySet="Alert" />
+            <End Role="AlertNote" EntitySet="AlertNote" />
+          </AssociationSet>
+          <AssociationSet Name="FK_City_Country" Association="Self.FK_City_Country">
+            <End Role="Country" EntitySet="Country" />
+            <End Role="City" EntitySet="City" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GasPollutant_Pollutant" Association="Self.FK_GasPollutant_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutant" />
+            <End Role="GasPollutant" EntitySet="GasPollutant" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParticulatePollutant_Pollutant" Association="Self.FK_ParticulatePollutant_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutant" />
+            <End Role="ParticulatePollutant" EntitySet="ParticulatePollutant" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AirQualityDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AirQualityRecord">
+          <Key>
+            <PropertyRef Name="RecordID" />
+          </Key>
+          <Property Name="RecordID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CityID" Type="Int32" Nullable="false" />
+          <Property Name="PollutantID" Type="Int32" Nullable="false" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="AQIValue" Type="Int32" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="AQICategory" Relationship="Self.FK_AirQualityRecord_Category" FromRole="AirQualityRecord" ToRole="AQICategory" />
+          <NavigationProperty Name="City" Relationship="Self.FK_AirQualityRecord_City" FromRole="AirQualityRecord" ToRole="City" />
+          <NavigationProperty Name="Pollutant" Relationship="Self.FK_AirQualityRecord_Pollutant" FromRole="AirQualityRecord" ToRole="Pollutant" />
+          <NavigationProperty Name="Alerts" Relationship="Self.FK_Alert_AirQualityRecord" FromRole="AirQualityRecord" ToRole="Alert" />
+        </EntityType>
+        <EntityType Name="Alert">
+          <Key>
+            <PropertyRef Name="AlertID" />
+          </Key>
+          <Property Name="AlertID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RecordID" Type="Int32" Nullable="false" />
+          <Property Name="AlertLevel" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AlertMessage" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="AirQualityRecord" Relationship="Self.FK_Alert_AirQualityRecord" FromRole="Alert" ToRole="AirQualityRecord" />
+          <NavigationProperty Name="AlertNotes" Relationship="Self.FK_AlertNote_Alert" FromRole="Alert" ToRole="AlertNote" />
+        </EntityType>
+        <EntityType Name="AlertNote">
+          <Key>
+            <PropertyRef Name="AlertID" />
+            <PropertyRef Name="NoteNo" />
+          </Key>
+          <Property Name="AlertID" Type="Int32" Nullable="false" />
+          <Property Name="NoteNo" Type="Int32" Nullable="false" />
+          <Property Name="NoteText" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Alert" Relationship="Self.FK_AlertNote_Alert" FromRole="AlertNote" ToRole="Alert" />
+        </EntityType>
+        <EntityType Name="AQICategory">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CategoryName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MinValue" Type="Int32" />
+          <Property Name="MaxValue" Type="Int32" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="AirQualityRecords" Relationship="Self.FK_AirQualityRecord_Category" FromRole="AQICategory" ToRole="AirQualityRecord" />
+        </EntityType>
+        <EntityType Name="City">
+          <Key>
+            <PropertyRef Name="CityID" />
+          </Key>
+          <Property Name="CityID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CityName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CountryID" Type="Int32" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="AirQualityRecords" Relationship="Self.FK_AirQualityRecord_City" FromRole="City" ToRole="AirQualityRecord" />
+          <NavigationProperty Name="Country" Relationship="Self.FK_City_Country" FromRole="City" ToRole="Country" />
+        </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="CountryID" />
+          </Key>
+          <Property Name="CountryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CountryName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Cities" Relationship="Self.FK_City_Country" FromRole="Country" ToRole="City" />
+        </EntityType>
+        <EntityType Name="GasPollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="Int32" Nullable="false" />
+          <Property Name="GasType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Pollutant" Relationship="Self.FK_GasPollutant_Pollutant" FromRole="GasPollutant" ToRole="Pollutant" />
+        </EntityType>
+        <EntityType Name="ParticulatePollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="Int32" Nullable="false" />
+          <Property Name="ParticleType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Pollutant" Relationship="Self.FK_ParticulatePollutant_Pollutant" FromRole="ParticulatePollutant" ToRole="Pollutant" />
+        </EntityType>
+        <EntityType Name="Pollutant">
+          <Key>
+            <PropertyRef Name="PollutantID" />
+          </Key>
+          <Property Name="PollutantID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PollutantName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="AirQualityRecords" Relationship="Self.FK_AirQualityRecord_Pollutant" FromRole="Pollutant" ToRole="AirQualityRecord" />
+          <NavigationProperty Name="GasPollutant" Relationship="Self.FK_GasPollutant_Pollutant" FromRole="Pollutant" ToRole="GasPollutant" />
+          <NavigationProperty Name="ParticulatePollutant" Relationship="Self.FK_ParticulatePollutant_Pollutant" FromRole="Pollutant" ToRole="ParticulatePollutant" />
+        </EntityType>
+        <Association Name="FK_AirQualityRecord_Category">
+          <End Role="AQICategory" Type="Self.AQICategory" Multiplicity="1" />
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AQICategory">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AirQualityRecord_City">
+          <End Role="City" Type="Self.City" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="City">
+              <PropertyRef Name="CityID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="CityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AirQualityRecord_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1" />
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="AirQualityRecord">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Alert_AirQualityRecord">
+          <End Role="AirQualityRecord" Type="Self.AirQualityRecord" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Alert" Type="Self.Alert" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AirQualityRecord">
+              <PropertyRef Name="RecordID" />
+            </Principal>
+            <Dependent Role="Alert">
+              <PropertyRef Name="RecordID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlertNote_Alert">
+          <End Role="Alert" Type="Self.Alert" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AlertNote" Type="Self.AlertNote" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Alert">
+              <PropertyRef Name="AlertID" />
+            </Principal>
+            <Dependent Role="AlertNote">
+              <PropertyRef Name="AlertID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_City_Country">
+          <End Role="Country" Type="Self.Country" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="City" Type="Self.City" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Country">
+              <PropertyRef Name="CountryID" />
+            </Principal>
+            <Dependent Role="City">
+              <PropertyRef Name="CountryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GasPollutant_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="GasPollutant" Type="Self.GasPollutant" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="GasPollutant">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParticulatePollutant_Pollutant">
+          <End Role="Pollutant" Type="Self.Pollutant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ParticulatePollutant" Type="Self.ParticulatePollutant" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Pollutant">
+              <PropertyRef Name="PollutantID" />
+            </Principal>
+            <Dependent Role="ParticulatePollutant">
+              <PropertyRef Name="PollutantID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AirQualityDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AirQualityRecords" EntityType="Self.AirQualityRecord" />
+          <EntitySet Name="Alerts" EntityType="Self.Alert" />
+          <EntitySet Name="AlertNotes" EntityType="Self.AlertNote" />
+          <EntitySet Name="AQICategories" EntityType="Self.AQICategory" />
+          <EntitySet Name="Cities" EntityType="Self.City" />
+          <EntitySet Name="Countries" EntityType="Self.Country" />
+          <EntitySet Name="GasPollutants" EntityType="Self.GasPollutant" />
+          <EntitySet Name="ParticulatePollutants" EntityType="Self.ParticulatePollutant" />
+          <EntitySet Name="Pollutants" EntityType="Self.Pollutant" />
+          <AssociationSet Name="FK_AirQualityRecord_Category" Association="Self.FK_AirQualityRecord_Category">
+            <End Role="AQICategory" EntitySet="AQICategories" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AirQualityRecord_City" Association="Self.FK_AirQualityRecord_City">
+            <End Role="City" EntitySet="Cities" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AirQualityRecord_Pollutant" Association="Self.FK_AirQualityRecord_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutants" />
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Alert_AirQualityRecord" Association="Self.FK_Alert_AirQualityRecord">
+            <End Role="AirQualityRecord" EntitySet="AirQualityRecords" />
+            <End Role="Alert" EntitySet="Alerts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlertNote_Alert" Association="Self.FK_AlertNote_Alert">
+            <End Role="Alert" EntitySet="Alerts" />
+            <End Role="AlertNote" EntitySet="AlertNotes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_City_Country" Association="Self.FK_City_Country">
+            <End Role="Country" EntitySet="Countries" />
+            <End Role="City" EntitySet="Cities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GasPollutant_Pollutant" Association="Self.FK_GasPollutant_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutants" />
+            <End Role="GasPollutant" EntitySet="GasPollutants" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParticulatePollutant_Pollutant" Association="Self.FK_ParticulatePollutant_Pollutant">
+            <End Role="Pollutant" EntitySet="Pollutants" />
+            <End Role="ParticulatePollutant" EntitySet="ParticulatePollutants" />
+          </AssociationSet>
+          <EntitySet Name="RawAirQualityImports" EntityType="AirQualityDBModel.RawAirQualityImport" />
+          <EntitySet Name="vw_AirQualityRecordDetails" EntityType="AirQualityDBModel.vw_AirQualityRecordDetails" />
+        </EntityContainer>
+        <EntityType Name="RawAirQualityImport">
+          <Key>
+            <PropertyRef Name="ImportRowID" />
+          </Key>
+          <Property Name="ImportRowID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CountryName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CityName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="AQIValue" Type="Int32" />
+          <Property Name="AQICategory" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CO_AQIValue" Type="Int32" />
+          <Property Name="CO_AQICategory" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Ozone_AQIValue" Type="Int32" />
+          <Property Name="Ozone_AQICategory" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NO2_AQIValue" Type="Int32" />
+          <Property Name="NO2_AQICategory" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="PM25_AQIValue" Type="Int32" />
+          <Property Name="PM25_AQICategory" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="vw_AirQualityRecordDetails">
+          <Key>
+            <PropertyRef Name="RecordID" />
+            <PropertyRef Name="CountryID" />
+            <PropertyRef Name="CountryName" />
+            <PropertyRef Name="CityID" />
+            <PropertyRef Name="CityName" />
+            <PropertyRef Name="PollutantID" />
+            <PropertyRef Name="PollutantName" />
+            <PropertyRef Name="AQIValue" />
+            <PropertyRef Name="CategoryID" />
+            <PropertyRef Name="CategoryName" />
+            <PropertyRef Name="RecordLastUpdated" />
+          </Key>
+          <Property Name="RecordID" Type="Int32" Nullable="false" />
+          <Property Name="CountryID" Type="Int32" Nullable="false" />
+          <Property Name="CountryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CityID" Type="Int32" Nullable="false" />
+          <Property Name="CityName" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="PollutantID" Type="Int32" Nullable="false" />
+          <Property Name="PollutantName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="AQIValue" Type="Int32" Nullable="false" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="CategoryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MinValue" Type="Int32" />
+          <Property Name="MaxValue" Type="Int32" />
+          <Property Name="RecordLastUpdated" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AirQualityDBModelStoreContainer" CdmEntityContainer="AirQualityDBEntities">
+          <EntitySetMapping Name="AirQualityRecords">
+            <EntityTypeMapping TypeName="AirQualityDBModel.AirQualityRecord">
+              <MappingFragment StoreEntitySet="AirQualityRecord">
+                <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+                <ScalarProperty Name="CityID" ColumnName="CityID" />
+                <ScalarProperty Name="PollutantID" ColumnName="PollutantID" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="AQIValue" ColumnName="AQIValue" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Alerts">
+            <EntityTypeMapping TypeName="AirQualityDBModel.Alert">
+              <MappingFragment StoreEntitySet="Alert">
+                <ScalarProperty Name="AlertID" ColumnName="AlertID" />
+                <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+                <ScalarProperty Name="AlertLevel" ColumnName="AlertLevel" />
+                <ScalarProperty Name="AlertMessage" ColumnName="AlertMessage" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AlertNotes">
+            <EntityTypeMapping TypeName="AirQualityDBModel.AlertNote">
+              <MappingFragment StoreEntitySet="AlertNote">
+                <ScalarProperty Name="AlertID" ColumnName="AlertID" />
+                <ScalarProperty Name="NoteNo" ColumnName="NoteNo" />
+                <ScalarProperty Name="NoteText" ColumnName="NoteText" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AQICategories">
+            <EntityTypeMapping TypeName="AirQualityDBModel.AQICategory">
+              <MappingFragment StoreEntitySet="AQICategory">
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="CategoryName" ColumnName="CategoryName" />
+                <ScalarProperty Name="MinValue" ColumnName="MinValue" />
+                <ScalarProperty Name="MaxValue" ColumnName="MaxValue" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Cities">
+            <EntityTypeMapping TypeName="AirQualityDBModel.City">
+              <MappingFragment StoreEntitySet="City">
+                <ScalarProperty Name="CityID" ColumnName="CityID" />
+                <ScalarProperty Name="CityName" ColumnName="CityName" />
+                <ScalarProperty Name="CountryID" ColumnName="CountryID" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Countries">
+            <EntityTypeMapping TypeName="AirQualityDBModel.Country">
+              <MappingFragment StoreEntitySet="Country">
+                <ScalarProperty Name="CountryID" ColumnName="CountryID" />
+                <ScalarProperty Name="CountryName" ColumnName="CountryName" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GasPollutants">
+            <EntityTypeMapping TypeName="AirQualityDBModel.GasPollutant">
+              <MappingFragment StoreEntitySet="GasPollutant">
+                <ScalarProperty Name="PollutantID" ColumnName="PollutantID" />
+                <ScalarProperty Name="GasType" ColumnName="GasType" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParticulatePollutants">
+            <EntityTypeMapping TypeName="AirQualityDBModel.ParticulatePollutant">
+              <MappingFragment StoreEntitySet="ParticulatePollutant">
+                <ScalarProperty Name="PollutantID" ColumnName="PollutantID" />
+                <ScalarProperty Name="ParticleType" ColumnName="ParticleType" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pollutants">
+            <EntityTypeMapping TypeName="AirQualityDBModel.Pollutant">
+              <MappingFragment StoreEntitySet="Pollutant">
+                <ScalarProperty Name="PollutantID" ColumnName="PollutantID" />
+                <ScalarProperty Name="PollutantName" ColumnName="PollutantName" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RawAirQualityImports">
+            <EntityTypeMapping TypeName="AirQualityDBModel.RawAirQualityImport">
+              <MappingFragment StoreEntitySet="RawAirQualityImport">
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="PM25_AQICategory" ColumnName="PM25_AQICategory" />
+                <ScalarProperty Name="PM25_AQIValue" ColumnName="PM25_AQIValue" />
+                <ScalarProperty Name="NO2_AQICategory" ColumnName="NO2_AQICategory" />
+                <ScalarProperty Name="NO2_AQIValue" ColumnName="NO2_AQIValue" />
+                <ScalarProperty Name="Ozone_AQICategory" ColumnName="Ozone_AQICategory" />
+                <ScalarProperty Name="Ozone_AQIValue" ColumnName="Ozone_AQIValue" />
+                <ScalarProperty Name="CO_AQICategory" ColumnName="CO_AQICategory" />
+                <ScalarProperty Name="CO_AQIValue" ColumnName="CO_AQIValue" />
+                <ScalarProperty Name="AQICategory" ColumnName="AQICategory" />
+                <ScalarProperty Name="AQIValue" ColumnName="AQIValue" />
+                <ScalarProperty Name="CityName" ColumnName="CityName" />
+                <ScalarProperty Name="CountryName" ColumnName="CountryName" />
+                <ScalarProperty Name="ImportRowID" ColumnName="ImportRowID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_AirQualityRecordDetails">
+            <EntityTypeMapping TypeName="AirQualityDBModel.vw_AirQualityRecordDetails">
+              <MappingFragment StoreEntitySet="vw_AirQualityRecordDetails">
+                <ScalarProperty Name="RecordLastUpdated" ColumnName="RecordLastUpdated" />
+                <ScalarProperty Name="MaxValue" ColumnName="MaxValue" />
+                <ScalarProperty Name="MinValue" ColumnName="MinValue" />
+                <ScalarProperty Name="CategoryName" ColumnName="CategoryName" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="AQIValue" ColumnName="AQIValue" />
+                <ScalarProperty Name="PollutantName" ColumnName="PollutantName" />
+                <ScalarProperty Name="PollutantID" ColumnName="PollutantID" />
+                <ScalarProperty Name="CityName" ColumnName="CityName" />
+                <ScalarProperty Name="CityID" ColumnName="CityID" />
+                <ScalarProperty Name="CountryName" ColumnName="CountryName" />
+                <ScalarProperty Name="CountryID" ColumnName="CountryID" />
+                <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

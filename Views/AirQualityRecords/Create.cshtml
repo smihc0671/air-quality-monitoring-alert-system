@@ -1,0 +1,99 @@
+﻿@model AirQualityAnalysis.Controllers.AirQualityRecordsController.CreateAirQualityRecordSetViewModel
+
+@{
+    ViewBag.Title = "Create Air Quality Record Set";
+}
+
+<h3>Create Air Quality Record Set</h3>
+
+<div style="max-width:700px;">
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @style = "margin-bottom:15px; color:red;" })
+
+        <div style="margin-bottom:20px;">
+            <label><strong>Country</strong></label><br />
+            <select name="SelectedCountryId" id="SelectedCountryId" style="padding:8px; width:100%; margin-top:6px;">
+                <option value="0">Select Country</option>
+                @foreach (var country in Model.Countries)
+                {
+                    <option value="@country.CountryID" @(Model.SelectedCountryId == country.CountryID ? "selected" : "")>@country.CountryName</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label><strong>City</strong></label><br />
+            <select name="SelectedCityId" id="SelectedCityId" style="padding:8px; width:100%; margin-top:6px;" @(Model.SelectedCountryId == 0 ? "disabled" : "")>
+                <option value="0">Select City</option>
+                @foreach (var city in Model.Cities)
+                {
+                    <option value="@city.CityID" @(Model.SelectedCityId == city.CityID ? "selected" : "")>@city.CityName</option>
+                }
+            </select>
+        </div>
+
+        <hr />
+
+        <div style="margin-bottom:15px;">
+            <label><strong>CO AQI</strong></label><br />
+            <input type="number" name="COAQIValue" value="@Model.COAQIValue" style="padding:8px; width:100%; margin-top:6px;" />
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label><strong>Ozone AQI</strong></label><br />
+            <input type="number" name="OzoneAQIValue" value="@Model.OzoneAQIValue" style="padding:8px; width:100%; margin-top:6px;" />
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label><strong>NO2 AQI</strong></label><br />
+            <input type="number" name="NO2AQIValue" value="@Model.NO2AQIValue" style="padding:8px; width:100%; margin-top:6px;" />
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label><strong>PM2.5 AQI</strong></label><br />
+            <input type="number" name="PM25AQIValue" value="@Model.PM25AQIValue" style="padding:8px; width:100%; margin-top:6px;" />
+        </div>
+
+        <div style="margin-top:20px;">
+            <input type="submit"
+                   value="Save"
+                   style="padding:8px 14px; background:#16a34a; color:white; border:none; border-radius:6px; margin-right:10px;" />
+
+            <a href="@Url.Action("Index", "AirQualityRecords")" style="padding:8px 14px;">
+                Cancel
+            </a>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script>
+document.getElementById("SelectedCountryId")?.addEventListener("change", function () {
+    var countryId = this.value || 0;
+    var citySelect = document.getElementById("SelectedCityId");
+    if (!citySelect) return;
+
+    if (countryId == 0) {
+        citySelect.innerHTML = '<option value="0">Select City</option>';
+        citySelect.setAttribute("disabled", "disabled");
+        return;
+    }
+
+    fetch('/Cities/GetCitiesByCountry?countryId=' + countryId)
+        .then(r => r.json())
+        .then(data => {
+            citySelect.innerHTML = '<option value="0">Select City</option>';
+            data.forEach(function (item) {
+                var opt = document.createElement('option');
+                opt.value = item.CityID;
+                opt.text = item.CityName;
+                citySelect.appendChild(opt);
+            });
+            citySelect.removeAttribute("disabled");
+        });
+});
+    </script>
+}

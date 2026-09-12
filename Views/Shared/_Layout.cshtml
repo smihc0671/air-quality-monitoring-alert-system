@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Air Quality Monitoring and Alert System</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            display: inline-block;
+            min-width: 90px;
+            text-align: center;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+            .pagination-btn:hover {
+                background: #e2e8f0;
+                color: #0f172a;
+                text-decoration: none;
+            }
+
+            .pagination-btn.disabled,
+            .pagination-btn[disabled] {
+                background: #f1f5f9;
+                color: #94a3b8;
+                border-color: #e2e8f0;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .pagination-info {
+            font-size: 15px;
+            font-weight: 500;
+            color: #0f172a;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+            .action-btn:hover {
+                background: #e2e8f0;
+                color: #0f172a;
+                text-decoration: none;
+            }
+
+        .action-btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+        }
+
+            .action-btn-primary:hover {
+                background: #1d4ed8;
+                color: white;
+            }
+
+        .action-btn-success {
+            background: #16a34a;
+            color: white;
+            border: none;
+        }
+
+            .action-btn-success:hover {
+                background: #15803d;
+                color: white;
+            }
+
+        .top-navbar {
+            background: #1f2937;
+            color: white;
+            padding: 14px 30px;
+        }
+
+        .layout-container {
+            margin-top: 30px;
+        }
+
+        .login-layout-container {
+            margin-top: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+    </style>
+</head>
+<body>
+    @{
+        var userRole = Session["UserRole"] as string;
+        bool isLoggedIn = !string.IsNullOrEmpty(userRole);
+
+        var controllerName = ViewContext.RouteData.Values["controller"] != null
+            ? ViewContext.RouteData.Values["controller"].ToString()
+            : "";
+
+        var actionName = ViewContext.RouteData.Values["action"] != null
+            ? ViewContext.RouteData.Values["action"].ToString()
+            : "";
+
+        bool isLoginPage = controllerName == "Account" && actionName == "Login";
+    }
+
+    <div class="top-navbar">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+                <a href="@(isLoggedIn ? Url.Action("Index", "Home") : Url.Action("Login", "Account"))"
+                   style="color:white; font-size:20px; text-decoration:none; margin-right:25px;">
+                    Air Quality Monitoring and Alert System
+                </a>
+
+                @if (isLoggedIn)
+                {
+                    <a href="@Url.Action("Index", "Countries")" style="color:#d1d5db; margin-right:18px; text-decoration:none;">Countries</a>
+                    <a href="@Url.Action("Index", "Cities")" style="color:#d1d5db; margin-right:18px; text-decoration:none;">Cities</a>
+                    <a href="@Url.Action("Index", "AirQualityRecords")" style="color:#d1d5db; margin-right:18px; text-decoration:none;">Air Quality Records</a>
+                    <a href="@Url.Action("Index", "Alerts")" style="color:#d1d5db; margin-right:18px; text-decoration:none;">Alerts</a>
+                }
+            </div>
+
+            <div>
+                @if (isLoggedIn)
+                {
+                    <span style="color:#d1d5db; margin-right:18px;">Role: @userRole</span>
+                    <a href="@Url.Action("Logout", "Account")" style="color:white; text-decoration:none;">Logout</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" style="color:white; text-decoration:none;">Login</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content @(isLoginPage ? "login-layout-container" : "layout-container")">
+        @RenderBody()
+
+        @if (!isLoginPage)
+        {
+            <hr />
+            <footer>
+                <p>&copy; 2026 - Air Quality Monitoring and Alert System</p>
+            </footer>
+        }
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

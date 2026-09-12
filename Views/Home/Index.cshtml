@@ -1,0 +1,173 @@
+﻿@model AirQualityAnalysis.Controllers.HomeController.HomeDashboardViewModel
+
+@{
+    ViewBag.Title = "Home";
+}
+
+<h2 style="margin-bottom:12px;">Air Quality Monitoring and Alert System</h2>
+
+<div style="margin-bottom:20px; font-size:15px;">
+    <strong>Welcome,</strong> @Model.Username
+</div>
+
+<div style="margin:15px 0 20px 0; padding:14px 18px; background:#f8fafc; border-left:4px solid #2563eb; border-radius:8px; font-size:14px; line-height:1.6;">
+    <div style="font-weight:600; margin-bottom:6px; color:#0f172a;">
+        Data Used in This System
+    </div>
+
+    <p style="margin:0 0 8px 0;">
+        The air quality data in this project was obtained from the
+        <em>Global Air Pollution Dataset</em> published on Kaggle.
+        This dataset contains AQI-based air quality records for countries and cities around the world.
+        Source:
+        <a href="https://www.kaggle.com/datasets/hasibalmuzdadid/global-air-pollution-dataset" target="_blank">
+            Global Air Pollution Dataset on Kaggle
+        </a>.
+    </p>
+
+    <p style="margin:0;">
+        <strong>AQI</strong> stands for <em>Air Quality Index</em>.
+        It is a numerical indicator used to show the level of air pollution.
+        Higher AQI values mean poorer air quality and higher potential health risk.
+        In this system, AQI values are used to compare locations and classify alerts as
+        Warning, High, Critical, or Emergency.
+    </p>
+</div>
+
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+    <div style="flex:1; min-width:200px; background:#f8fafc; border:1px solid #dbeafe; border-radius:10px; padding:12px;">
+        <div style="font-size:13px; color:#475569;">Total Countries</div>
+        <div style="font-size:24px; font-weight:bold;">@Model.TotalCountries</div>
+    </div>
+
+    <div style="flex:1; min-width:200px; background:#f8fafc; border:1px solid #d1fae5; border-radius:10px; padding:12px;">
+        <div style="font-size:13px; color:#475569;">Total Cities</div>
+        <div style="font-size:24px; font-weight:bold;">@Model.TotalCities</div>
+    </div>
+
+    <div style="flex:1; min-width:200px; background:#f8fafc; border:1px solid #fee2e2; border-radius:10px; padding:12px;">
+        <div style="font-size:13px; color:#475569;">Generated Air Quality Alerts</div>
+        <div style="font-size:24px; font-weight:bold;">@Model.TotalAlerts</div>
+    </div>
+
+    <div style="flex:1; min-width:200px; background:#f8fafc; border:1px solid #fef3c7; border-radius:10px; padding:12px;">
+        <div style="font-size:13px; color:#475569;">Highest AQI City</div>
+        <div style="font-size:16px; font-weight:bold;">@Model.MostRiskyCityName</div>
+        <div style="margin-top:4px; font-size:13px; color:#b45309;">AQI Value: @Model.MostRiskyCityAQI</div>
+    </div>
+</div>
+
+<div style="display:flex; gap:24px; flex-wrap:wrap;">
+    <div style="flex:2; min-width:340px; background:white; border:1px solid #e5e7eb; border-radius:10px; padding:18px;">
+        <h4 style="margin-top:0;">Top 10 Countries by Average Air Quality Index</h4>
+        <canvas id="topCountriesChart" height="180"></canvas>
+    </div>
+
+    <div style="flex:1; min-width:320px; background:white; border:1px solid #e5e7eb; border-radius:10px; padding:18px;">
+        <h4 style="margin-top:0;">Generated Alerts by Level</h4>
+        <p style="font-size:13px; color:#64748b; margin-top:-6px; margin-bottom:12px;">
+            Distribution of all alert records generated from AQI values.
+        </p>
+        <canvas id="alertLevelsChart" height="180"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    const topCountryLabels = [
+        @Html.Raw(string.Join(",", Model.TopCountryLabels.Select(x => "'" + x.Replace("'", "\\'") + "'")))
+    ];
+
+    const topCountryValues = [
+        @Html.Raw(string.Join(",", Model.TopCountryAverageAQIValues))
+    ];
+
+    function getAQIColor(value) {
+        if (value <= 50) return 'rgba(34, 197, 94, 0.75)';
+        if (value <= 100) return 'rgba(250, 204, 21, 0.75)';
+        if (value <= 150) return 'rgba(249, 115, 22, 0.75)';
+        if (value <= 200) return 'rgba(239, 68, 68, 0.75)';
+        return 'rgba(127, 29, 29, 0.8)';
+    }
+
+    const barColors = topCountryValues.map(x => getAQIColor(x));
+
+    const topCountriesCtx = document.getElementById('topCountriesChart');
+    if (topCountriesCtx) {
+        new Chart(topCountriesCtx, {
+            type: 'bar',
+            data: {
+                labels: topCountryLabels,
+                datasets: [{
+                    label: 'Average Air Quality Index',
+                    data: topCountryValues,
+                    backgroundColor: barColors,
+                    borderColor: barColors,
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' Average AQI Value: ' + context.raw;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Average Air Quality Index'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const alertLevelsCtx = document.getElementById('alertLevelsChart');
+    if (alertLevelsCtx) {
+        new Chart(alertLevelsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Warning', 'High', 'Critical', 'Emergency'],
+                datasets: [{
+                    data: [
+                        @Model.WarningCount,
+                        @Model.HighCount,
+                        @Model.CriticalCount,
+                        @Model.EmergencyCount
+                    ],
+                    backgroundColor: [
+                        'rgba(251, 191, 36, 0.7)',
+                        'rgba(249, 115, 22, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(127, 29, 29, 0.8)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+    </script>
+}

@@ -1,0 +1,151 @@
+﻿@model List<AirQualityAnalysis.Controllers.CitiesController.CityListItemViewModel>
+
+@{
+    ViewBag.Title = "Cities";
+
+    var userRole = Session["UserRole"] as string;
+    bool isAdmin = userRole == "Admin";
+
+    string searchCity = ViewBag.SearchCity != null ? ViewBag.SearchCity.ToString() : "";
+    int page = ViewBag.Page != null ? (int)ViewBag.Page : 1;
+    int pageSize = ViewBag.PageSize != null ? (int)ViewBag.PageSize : 10;
+    int totalRecords = ViewBag.TotalRecords != null ? (int)ViewBag.TotalRecords : 0;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 0;
+    int[] pageSizes = ViewBag.PageSizes != null ? (int[])ViewBag.PageSizes : new[] { 10, 25, 50 };
+    string sortOption = ViewBag.SortOption != null ? ViewBag.SortOption.ToString() : "cityNameAsc";
+}
+
+<h3>Cities</h3>
+
+@using (Html.BeginForm("Index", "Cities", FormMethod.Get))
+{
+    <div style="display:flex; gap:12px; align-items:end; margin-bottom:20px; flex-wrap:wrap;">
+
+        <div>
+            <label>Search City</label><br />
+            <input type="text" name="searchCity" value="@searchCity"
+                   placeholder="Enter city name..." style="padding:6px; width:220px;" />
+        </div>
+
+        <div>
+            <label>Page Size</label><br />
+            <select name="pageSize" style="padding:6px;">
+                @foreach (var size in pageSizes)
+                {
+                    <option value="@size" @(pageSize == size ? "selected" : "")>@size</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Sort By</label><br />
+            <select name="sortOption" style="padding:6px; width:220px;">
+                <option value="cityIdAsc" @(sortOption == "cityIdAsc" ? "selected" : "")>City ID (Low to High)</option>
+                <option value="cityIdDesc" @(sortOption == "cityIdDesc" ? "selected" : "")>City ID (High to Low)</option>
+                <option value="cityNameAsc" @(sortOption == "cityNameAsc" ? "selected" : "")>City Name (A-Z)</option>
+                <option value="cityNameDesc" @(sortOption == "cityNameDesc" ? "selected" : "")>City Name (Z-A)</option>
+                <option value="countryNameAsc" @(sortOption == "countryNameAsc" ? "selected" : "")>Country Name (A-Z)</option>
+                <option value="countryNameDesc" @(sortOption == "countryNameDesc" ? "selected" : "")>Country Name (Z-A)</option>
+                <option value="dateAsc" @(sortOption == "dateAsc" ? "selected" : "")>Last Updated (Oldest to Newest)</option>
+                <option value="dateDesc" @(sortOption == "dateDesc" ? "selected" : "")>Last Updated (Newest to Oldest)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="action-btn action-btn-primary">Apply</button>
+
+        <a href="@Url.Action("Index", "Cities")" class="action-btn">Clear</a>
+
+        @if (isAdmin)
+        {
+            <a href="@Url.Action("Create", "Cities")" class="action-btn action-btn-success">
+                Create New City
+            </a>
+        }
+    </div>
+}
+
+<div class="pagination-bar">
+    @if (page > 1)
+    {
+        <a class="pagination-btn" href="@Url.Action("Index", new {
+            searchCity = searchCity,
+            page = page - 1,
+            pageSize = pageSize,
+            sortOption = sortOption
+        })">Previous</a>
+    }
+    else
+    {
+        <span class="pagination-btn disabled">Previous</span>
+    }
+
+    <span class="pagination-info">Page @page of @totalPages</span>
+
+    @if (page < totalPages)
+    {
+        <a class="pagination-btn" href="@Url.Action("Index", new {
+            searchCity = searchCity,
+            page = page + 1,
+            pageSize = pageSize,
+            sortOption = sortOption
+        })">Next</a>
+    }
+    else
+    {
+        <span class="pagination-btn disabled">Next</span>
+    }
+</div>
+
+<div style="margin-bottom:15px;">
+    Total Records: @totalRecords
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No cities found.</p>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>City ID</th>
+                <th>City Name</th>
+                <th>Country Name</th>
+                <th>Last Updated</th>
+                @if (isAdmin)
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CityID</td>
+                    <td>@item.CityName</td>
+                    <td>@item.CountryName</td>
+                    <td>@item.LastUpdated.ToString("dd.MM.yyyy HH:mm:ss")</td>
+
+                    @if (isAdmin)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit", "Cities", new { id = item.CityID })"
+                               class="btn btn-primary btn-sm"
+                               style="margin-right:8px;">
+                                Edit
+                            </a>
+
+                            <a href="@Url.Action("Delete", "Cities", new { id = item.CityID })"
+                               class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

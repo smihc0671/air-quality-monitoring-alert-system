@@ -1,0 +1,152 @@
+﻿@model List<AirQualityAnalysis.Country>
+
+@{
+    ViewBag.Title = "Countries";
+
+    var userRole = Session["UserRole"] as string;
+    bool isAdmin = userRole == "Admin";
+
+    string searchText = ViewBag.SearchText != null ? ViewBag.SearchText.ToString() : "";
+    int page = ViewBag.Page != null ? (int)ViewBag.Page : 1;
+    int pageSize = ViewBag.PageSize != null ? (int)ViewBag.PageSize : 10;
+    int totalRecords = ViewBag.TotalRecords != null ? (int)ViewBag.TotalRecords : 0;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 0;
+    string sortOption = ViewBag.SortOption != null ? ViewBag.SortOption.ToString() : "nameAsc";
+}
+
+<h2>Countries</h2>
+
+@using (Html.BeginForm("Index", "Countries", FormMethod.Get))
+{
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; align-items:end;">
+        <div>
+            <label>Search Country</label><br />
+            <input type="text" name="searchText" value="@searchText"
+                   placeholder="Enter country name..."
+                   style="padding:6px; width:240px;" />
+        </div>
+
+        <div>
+            <label>Page Size</label><br />
+            <select name="pageSize" style="padding:6px; width:100px;">
+                <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
+                <option value="25" @(pageSize == 25 ? "selected" : "")>25</option>
+                <option value="50" @(pageSize == 50 ? "selected" : "")>50</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Sort By</label><br />
+            <select name="sortOption" style="padding:6px; width:190px;">
+                <option value="nameAsc" @(sortOption == "nameAsc" ? "selected" : "")>Name (A-Z)</option>
+                <option value="nameDesc" @(sortOption == "nameDesc" ? "selected" : "")>Name (Z-A)</option>
+                <option value="idAsc" @(sortOption == "idAsc" ? "selected" : "")>ID (Low to High)</option>
+                <option value="idDesc" @(sortOption == "idDesc" ? "selected" : "")>ID (High to Low)</option>
+                <option value="dateAsc" @(sortOption == "dateAsc" ? "selected" : "")>Date (Oldest to Newest)</option>
+                <option value="dateDesc" @(sortOption == "dateDesc" ? "selected" : "")>Date (Newest to Oldest)</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="action-btn action-btn-primary">Apply</button>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Index", "Countries")" class="action-btn">
+                Clear
+            </a>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div>
+                <a href="@Url.Action("Create", "Countries")" class="action-btn action-btn-success">
+                    Create New Country
+                </a>
+            </div>
+        }
+    </div>
+}
+
+<div class="pagination-bar">
+    @if (page > 1)
+    {
+        <a class="pagination-btn" href="@Url.Action("Index", new {
+            searchText = searchText,
+            page = page - 1,
+            pageSize = pageSize,
+            sortOption = sortOption
+        })">Previous</a>
+    }
+    else
+    {
+        <span class="pagination-btn disabled">Previous</span>
+    }
+
+    <span class="pagination-info">Page @page of @totalPages</span>
+
+    @if (page < totalPages)
+    {
+        <a class="pagination-btn" href="@Url.Action("Index", new {
+            searchText = searchText,
+            page = page + 1,
+            pageSize = pageSize,
+            sortOption = sortOption
+        })">Next</a>
+    }
+    else
+    {
+        <span class="pagination-btn disabled">Next</span>
+    }
+</div>
+
+<div style="margin-bottom:15px;">
+    Total Records: @totalRecords
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No countries found.</p>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Country ID</th>
+                <th>Country Name</th>
+                <th>Last Updated</th>
+                @if (isAdmin)
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CountryID</td>
+                    <td>@item.CountryName</td>
+                    <td>@item.LastUpdated.ToString("dd.MM.yyyy HH:mm:ss")</td>
+
+                    @if (isAdmin)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit", "Countries", new { id = item.CountryID })"
+                               class="btn btn-primary btn-sm"
+                               style="margin-right:8px;">
+                                Edit
+                            </a>
+
+                            <a href="@Url.Action("Delete", "Countries", new { id = item.CountryID })"
+                               class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

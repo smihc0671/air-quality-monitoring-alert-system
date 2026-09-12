@@ -1,0 +1,32 @@
+﻿@model AirQualityAnalysis.Country
+
+@{
+    ViewBag.Title = "Create Country";
+}
+
+<h3>Create Country</h3>
+
+<div style="max-width:500px;">
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div style="margin-bottom:15px;">
+            <label>Country Name</label><br />
+            @Html.TextBoxFor(model => model.CountryName, new { style = "padding:8px; width:100%;" })
+        </div>
+
+        <div style="margin-top:20px;">
+            <input type="submit"
+                   value="Save"
+                   style="padding:8px 14px; background:#16a34a; color:white; border:none; border-radius:6px; margin-right:10px;" />
+
+            <a href="@Url.Action("Index","Countries")"
+               style="padding:8px 14px;">
+                Cancel
+            </a>
+        </div>
+    }
+
+</div>

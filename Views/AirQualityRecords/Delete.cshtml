@@ -1,0 +1,43 @@
+﻿@model AirQualityAnalysis.Controllers.AirQualityRecordsController.DeleteAirQualityRecordViewModel
+
+@{
+    ViewBag.Title = "Delete Air Quality Record";
+}
+
+<h3>Delete Air Quality Record</h3>
+
+<p>Are you sure you want to delete this record?</p>
+
+<ul>
+    <li><b>Record ID:</b> @Model.RecordID</li>
+    <li><b>Country:</b> @Model.CountryName</li>
+    <li><b>City:</b> @Model.CityName</li>
+    <li><b>Pollutant:</b> @Model.PollutantName</li>
+    <li><b>Category:</b> @Model.CategoryName</li>
+    <li><b>AQI Value:</b> @Model.AQIValue</li>
+    <li><b>Last Updated:</b> @Model.LastUpdated</li>
+</ul>
+
+@using (Html.BeginForm("Delete", "AirQualityRecords", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.RecordID)
+    @Html.HiddenFor(x => x.CityID)
+    @Html.HiddenFor(x => x.ReturnCountryId)
+    @Html.HiddenFor(x => x.ReturnCityId)
+    @Html.HiddenFor(x => x.ReturnPollutantId)
+    @Html.HiddenFor(x => x.ReturnPage)
+
+    <input type="submit" value="Delete" class="btn btn-danger me-2" />
+
+    <a class="btn btn-secondary"
+       href="@Url.Action("CityRecords", "AirQualityRecords", new {
+       cityId = Model.CityID,
+       countryId = Model.ReturnCountryId,
+       selectedCityId = Model.CityID,
+       pollutantId = Model.ReturnPollutantId,
+       page = Model.ReturnPage
+   })">
+        Back
+    </a>
+}

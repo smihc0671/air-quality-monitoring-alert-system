@@ -1,0 +1,59 @@
+﻿@model AirQualityAnalysis.Controllers.AirQualityRecordsController.AddAirQualityRecordViewModel
+
+@{
+    ViewBag.Title = "Add Air Quality Record";
+}
+
+<h3>Add Air Quality Record</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(x => x.ReturnCityId)
+    @Html.HiddenFor(x => x.PollutantToAddId)
+    @Html.HiddenFor(x => x.CountryId)
+    @Html.HiddenFor(x => x.CityId)
+    @Html.HiddenFor(x => x.PollutantId)
+    @Html.HiddenFor(x => x.Page)
+
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+    <div style="max-width:500px;">
+        <div style="margin-bottom:15px;">
+            <label>Country</label><br />
+            <input value="@Model.CountryName" readonly style="padding:8px; width:100%;" />
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label>City</label><br />
+            <input value="@Model.CityName" readonly style="padding:8px; width:100%;" />
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label>Pollutant</label><br />
+            <input value="@Model.PollutantName" readonly style="padding:8px; width:100%;" />
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label>AQI Value</label><br />
+            @Html.TextBoxFor(x => x.AQIValue, new { type = "number", style = "padding:8px; width:100%;" })
+        </div>
+
+        <div style="margin-top:20px;">
+            <input type="submit"
+                   value="Save"
+                   style="padding:8px 14px; background:#16a34a; color:white; border:none; border-radius:6px; margin-right:10px;" />
+
+            <a href="@Url.Action("CityRecords", "AirQualityRecords", new {
+                cityId = Model.ReturnCityId,
+                countryId = Model.CountryId,
+                selectedCityId = Model.CityId,
+                pollutantId = Model.PollutantId,
+                page = Model.Page
+            })" style="padding:8px 14px;">
+                Cancel
+            </a>
+        </div>
+    </div>
+}

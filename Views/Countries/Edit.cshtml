@@ -1,0 +1,37 @@
+﻿@model AirQualityAnalysis.Country
+
+@{
+    ViewBag.Title = "Edit Country";
+}
+
+<h3>Edit Country</h3>
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div style="max-width:500px;">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.CountryID)
+
+            <div style="margin-bottom:15px;">
+                <label>Country Name</label><br />
+                @Html.TextBoxFor(model => model.CountryName, new { style = "padding:8px; width:100%;" })
+            </div>
+
+            <div style="margin-top:20px;">
+                <input type="submit"
+                       value="Update"
+                       style="padding:8px 14px; background:#2563eb; color:white; border:none; border-radius:6px; margin-right:10px;" />
+
+                <a href="@Url.Action("Index", "Countries")" style="padding:8px 14px;">
+                    Cancel
+                </a>
+            </div>
+        }
+    </div>
+}
